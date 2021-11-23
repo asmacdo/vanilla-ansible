@@ -1,8 +1,8 @@
 ---
 collections:
-  - name: community.kubernetes
-    version: "1.2.1"
-  - name: git@github.com:asmacdo/operator-sdk-ansible-util.git
+  # - name: community.kubernetes
+  #   version: "1.2.1
+  - name: https://github.com/asmacdo/operator-sdk-ansible-util/
     type: git
     version: ansible-add-metrics
 

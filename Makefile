@@ -63,7 +63,7 @@ run: ansible-operator ## Run against the configured Kubernetes cluster in ~/.kub
 	$(ANSIBLE_OPERATOR) run
 
 docker-build: ## Build docker image with the manager.
-	docker build -t ${IMG} .
+	docker build -t ${IMG} . --no-cache
 
 docker-push: ## Push docker image with the manager.
 	docker push ${IMG}
@@ -74,14 +74,14 @@ install: kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/con
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
 
 uninstall: kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
-	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+	$(KUSTOMIZE) build config/crd | kubectl delete -f - --ignore-not-found
 
 deploy: kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
-	$(KUSTOMIZE) build config/default | kubectl delete -f -
+	$(KUSTOMIZE) build config/default | kubectl delete -f - --ignore-not-found
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
@@ -175,3 +175,6 @@ catalog-push: ## Push a catalog image.
 
 sample:
 	kubectl apply -f config/samples/cache_v1alpha1_memcached.yaml
+
+kind:
+	kind load docker-image ${IMG}
