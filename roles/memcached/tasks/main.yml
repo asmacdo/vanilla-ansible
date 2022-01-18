@@ -3,44 +3,134 @@
 # ---
 - name: create my_counter_metric
   osdk_metric:
-    name: my_counter_metric2
+    name: my_counter_metric
     description: Random counter metric
     counter: {}
+  register: newcounter_out
+
+- debug:
+    var: newcounter_out
 
 - name: increment my_counter_metric
   osdk_metric:
     name: my_counter_metric
     description: Random counter metric
-    counter:
+    gauge:
       increment: yes
+  register: gauge_out
 
-- name: add 3.14 to my_counter_metric
+- debug:
+    var: gauge_out
+
+# - name: add 3.14 to my_counter_metric
+#   osdk_metric:
+#     name: my_counter_metric
+#     description: Random counter metric
+#     counter:
+#       add: 3.14
+# - name: increment my_counter_metric
+#   osdk_metric:
+#     name: my_counter_metric
+#     description: Random counter metric
+#     counter:
+#       increment: yes
+# - name: add 3.14 to my_counter_metric
+#   osdk_metric:
+#     name: my_counter_metric
+#     description: Random counter metric
+#     counter:
+#       add: 3.14
+# - name: add 3.14 to my_counter_metric2
+#   osdk_metric:
+#     name: my_counter_metric2
+#     description: Random counter metric
+#     counter:
+#       add: 3.14
+# - name: subtract
+#   osdk_metric:
+#     name: my_counter_metric2
+#     description: Random counter metric
+#     counter:
+#       add: -3.14
+#
+- name: Gauge sanity
   osdk_metric:
-    name: my_counter_metric
-    description: Random counter metric
-    counter:
-      add: 3.14
-- name: increment my_counter_metric
-  osdk_metric:
-    name: my_counter_metric
-    description: Random counter metric
-    counter:
-      increment: yes
-- name: add 3.14 to my_counter_metric
-  osdk_metric:
-    name: my_counter_metric
-    description: Random counter metric
-    counter:
-      add: 3.14
-- name: add 3.14 to my_counter_metric2
-  osdk_metric:
-    name: my_counter_metric2
-    description: Random counter metric
-    counter:
-      add: 3.14
-- name: subtract
-  osdk_metric:
-    name: my_counter_metric2
-    description: Random counter metric
-    counter:
-      add: -3.14
+    name: my_gauge_metric
+    description: please just work
+    gauge: {}
+#
+# - name: Gauge set
+#   osdk_metric:
+#     name: my_gauge_metric
+#     description: please just work
+#     gauge:
+#       set: 2
+#
+# - name: Gauge incrememt
+#   osdk_metric:
+#     name: my_gauge_metric
+#     description: please just work again
+#     gauge:
+#       increment: yes
+#
+# - name: Gauge decrement
+#   osdk_metric:
+#     name: my_gauge_metric
+#     description: please just work again
+#     gauge:
+#       decrement: yes
+#
+# - name: Gauge add
+#   osdk_metric:
+#     name: my_gauge_metric
+#     description: please just work again
+#     gauge:
+#       add: 2
+#
+# - name: Gauge subract
+#   osdk_metric:
+#     name: my_gauge_metric
+#     description: please just work again
+#     gauge:
+#       subtract: 2
+#
+# - name: Histogram sanity
+#   osdk_metric:
+#     name: my_histogram_metric
+#     description: please just work again
+#     histogram:
+#       observe: 2
+#
+# # TODO(asmacdo) what happens if you use a different metric type for an existing metric name?
+# - name: Summary sanity
+#   osdk_metric:
+#     name: my_summary_metric
+#     description: please just work again
+#     summary:
+#       observe: 2
+#
+# - name: SetToCurrentTime sanity
+#   osdk_metric:
+#     name: my_gauge_metric
+#     description: please just work again
+#     gauge:
+#       set_to_current_time: yes
+
+
+
+
+
+- name: CURL METRICS
+  uri:
+    url: http://localhost:8080/metrics
+    return_content: yes
+  register: metrics_output
+
+- name: Parse with Python
+  script: files/parser.py "{{ metrics_output }}"
+  args:
+    executable: python3
+  register: python_out
+
+- debug:
+    msg: "{{ python_out.stdout | from_json }}"

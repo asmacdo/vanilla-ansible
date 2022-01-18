@@ -178,3 +178,10 @@ sample:
 
 kind:
 	kind load docker-image ${IMG}
+
+again:
+	./again.sh
+
+rebuild:
+	./rebuild.sh
+	./again.sh
